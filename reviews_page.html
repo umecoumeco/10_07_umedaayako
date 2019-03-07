@@ -155,44 +155,47 @@
                     console.log("complete");
                 });
         }
-        selectData();
 
 
         //DBへデータを登録する関数
-        function insertData() {
-            const url = 'ajax_post.php';
-            const value = {
-                task: $('#task').val(), //キーと値の指定
-                deadline: $('#deadline').val(), //PHPでは$_POST['キー名']で受取
-                comment: $('#comment').val()
-            };
-            // データ送信
-            $.ajax({
-                dataType: 'json',
-                url: url,
-                type: 'POST',
-                data: value
-            })
-                .done(function (data) {
-                    console.log(data);
-                    selectData();
-                    $("#echo").html(listData(data));
-                })
-                .fail(function (XMLHttpRequest, textStatus, errorThrown) {
-                    console.log("error");
-                })
-                .always(function () {
-                    console.log("complete");
-                });
-        }
+        // function insertData() {
+        //     //本当はここでURL変数の変数部分だけとりだしたい
+        //     // const url = 'ajax_post.php';
+        //     // const value = {
+        //     service_name: utm_source,
+        //     };
+        // // データ送信
+        // $.ajax({
+        //     dataType: 'json',
+        //     url: url,
+        //     type: 'POST',
+        //     data: value
+        // })
+        //     .done(function (data) {
+        //         console.log(data);
+        //         selectData();
+        //     })
+        //     .fail(function (XMLHttpRequest, textStatus, errorThrown) {
+        //         console.log("error");
+        //     })
+        //     .always(function () {
+        //         console.log("complete");
+        //     });
+        // }
+
+        // function parseLocationParam() {
+        //     var param = {};
+        //     var list = location.search.substring(1).split('&');
+        //     for (var i = 0; i & amp; amp; lt; list.length; i++) {
+        //         var tmpParam = list[i].split('=');
+        //         param[tmpParam[0]] = tmpParam[1];
+        //     }
+        //     return param;
+        // }
 
         // 読み込み時にDBからデータ取得
-
-        // 送信でDBにデータ送信
-        $("#send").on("click", function () {
-            // insertData();
-            selectData();
-        });
+        // insertData();
+        selectData();
 
     </script>
 </body>

@@ -53,10 +53,33 @@
     <script>
         // DBから取得したデータを表示する関数
         function listData(data) {
-            // 書ける人は書いてみよう
+            const url = 'reviews_page.html';
+            const value = {
+                service_name: $('#service_name').val(), //キーと値の指定
+            };
+            // データ送信
+            $.ajax({
+                dataType: 'json',
+                url: url,
+                type: 'POST',
+                data: value
+            })
+                .done(function (data) {
+                    console.log(data);
+                    $("#echo").html(writeData(data));
+                })
+                .fail(function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("error");
+                })
+                .always(function () {
+                    console.log("complete");
+                });
+        }
+
+        function writeData(data) {
             var str = "";
             for (var i = 0; i < data.length; i++) {
-                str += `<li><a href="reviews_page.html">${data[i].service_name}</li>`
+                str += `<li><a href="reviews_page.html?service_name=${data[i].service_name}">${data[i].service_name}</li>`
             }
             return str;
         }
@@ -79,7 +102,7 @@
                     if (data.length == 0) {
                         $("#echo").text("該当する検索結果はありません。");
                     } else {
-                        $("#echo").html(listData(data));
+                        $("#echo").html(writeData(data));
                     }
                 })
                 .fail(function (XMLHttpRequest, textStatus, errorThrown) {
