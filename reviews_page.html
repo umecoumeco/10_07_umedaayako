@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>口コミ詳細</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <style>
+        div {
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">口コミの詳細</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a id="ajax_get" class="nav-link" href="service_search.html">サービス検索</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <!-- データ表示部分 -->
+    <p id="title"></p>
+    <canvas id="chart"></canvas>
+    <ul id="reviews" class="list-group"></ul>
+
+
+    </ul>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+    <script>
+        // DBから取得したデータを表示する関数
+        function ServiceTitle(data) {
+            var str = "";
+            var length = data.length;
+            console.log(length);
+            for (var i = 0; i < 1; i++) {
+                str += `<span style=font-size:20px;>${data[i].service_name}</span>`
+                str += `の口コミは`
+                str += length
+                str += `件です。`
+            }
+            return str;
+        }
+
+        function chart(data) {
+            var length = data.length;
+            console.log(length);
+            var a = 0;
+            var b = 0;
+            var c = 0;
+            var d = 0;
+            var e = 0;
+            var f = 0;
+            for (var i = 0; i < data.length; i++) {
+                a += Number(`${data[i].reviews_point_a}`);
+                b += Number(`${data[i].reviews_point_b}`);
+                c += Number(`${data[i].reviews_point_c}`);
+                d += Number(`${data[i].reviews_point_d}`);
+                e += Number(`${data[i].reviews_point_e}`);
+                f += Number(`${data[i].reviews_point_f}`);
+            }
+            a = a / length;
+            b = b / length;
+            c = c / length;
+            d = d / length;
+            e = e / length;
+            f = f / length;
+            var ctx = document.getElementById("chart");
+            var myRadarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ["価格", "UI/UX", "導入効果", "導入しやすさ", "カスタマーサポート", "工数削減"],
+                    datasets: [{
+                        label: '平均点',
+                        data: [a, b, c, d, e, f],
+                        backgroundColor: 'RGBA(225,95,150, 0.5)',
+                        borderColor: 'RGBA(225,95,150, 1)',
+                        borderWidth: 1,
+                        pointBackgroundColor: 'RGB(46,106,177)'
+                    }]
+                },
+                options: {
+                    title: {
+                        display: true,
+                        text: '口コミ総合評価'
+                    },
+                    scale: {
+                        ticks: {
+                            suggestedMin: 0,
+                            suggestedMax: 5,
+                            stepSize: 1,
+                        }
+                    }
+                }
+            });
+        }
+
+        function reviewData(data) {
+            // dataを<li>に入れていい感じに表示しよう！
+            var str = "";
+            for (var i = 0; i < data.length; i++) {
+                str += `<li>
+                 <p>------------------------------------------------------------------------------------------------------------------------------------------</p>
+                 <p style="font-weight:bold;">▼ユーザー属性</p>
+                 <p>■従業員規模：${data[i].responda_a}■業種：${data[i].responda_b}■回答者のポジション：${data[i].responda_c}</p>
+                 <p style="font-weight:bold;">▼点数</p>
+                 <p>■総合点：${data[i].reviews_all}■価格：${data[i].reviews_point_a}■UI/UX：${data[i].reviews_point_b}■導入効果：${data[i].reviews_point_c}■導入しやすさ：${data[i].reviews_point_d}■カスタマーサポート：${data[i].reviews_point_e}■工数削減：${data[i].reviews_point_f}</p>
+                 <p style="font-weight:bold;">▼価格</p>
+                 <p>${data[i].reviews_text_a}</p>
+                 <p style="font-weight:bold;">▼UI/UX</p>
+                 <p>${data[i].reviews_text_b}</p>
+                 <p style="font-weight:bold;">▼導入効果</p>
+                 <p>${data[i].reviews_text_c}</p>
+                 <p style="font-weight:bold;">▼導入しやすさ</p>
+                 <p>${data[i].reviews_text_d}</p>
+                 <p style="font-weight:bold;">▼カスタマーサポート</p>
+                 <p>${data[i].reviews_text_e}</p>
+                 <p style="font-weight:bold;">▼工数削減</p>
+                 <p>${data[i].reviews_text_f}</p>
+                    </li>`
+            }
+            return str;
+        }
+
+        // DBからデータを取得する関数
+        function selectData() {
+            const url = 'ajax_get.php';
+            $.getJSON(url)
+                .done(function (data, textStatus, jqXHR) {
+                    $("#title").html(ServiceTitle(data));
+                    $("#chart").html(chart(data));
+                    $("#reviews").html(reviewData(data));
+                    console.log(data);
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    console.log("error");
+                })
+                .always(function () {
+                    console.log("complete");
+                });
+        }
+        selectData();
+
+
+        //DBへデータを登録する関数
+        function insertData() {
+            const url = 'ajax_post.php';
+            const value = {
+                task: $('#task').val(), //キーと値の指定
+                deadline: $('#deadline').val(), //PHPでは$_POST['キー名']で受取
+                comment: $('#comment').val()
+            };
+            // データ送信
+            $.ajax({
+                dataType: 'json',
+                url: url,
+                type: 'POST',
+                data: value
+            })
+                .done(function (data) {
+                    console.log(data);
+                    selectData();
+                    $("#echo").html(listData(data));
+                })
+                .fail(function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("error");
+                })
+                .always(function () {
+                    console.log("complete");
+                });
+        }
+
+        // 読み込み時にDBからデータ取得
+
+        // 送信でDBにデータ送信
+        $("#send").on("click", function () {
+            // insertData();
+            selectData();
+        });
+
+    </script>
+</body>
+
+</html>
